@@ -25,7 +25,6 @@
             SetConnections();
 
             Size = GetRoomNumbers(Rooms).Count;
-
         }
         public void SetNeighbors()
         {

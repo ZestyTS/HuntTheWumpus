@@ -1,5 +1,5 @@
 using HuntTheWumpus.Controller;
-namespace UnitTest.Controller
+namespace UnitTest.ControllerTest
 {
     [TestClass]
     public class GameTest
@@ -7,6 +7,7 @@ namespace UnitTest.Controller
         [TestMethod]
         public void GameSetup()
         {
+            //Silly way to test that the project can get to the GUI without errors
             try
             {
                 var game = new Game();
