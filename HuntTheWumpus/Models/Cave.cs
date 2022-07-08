@@ -3,12 +3,15 @@
     public class Cave
     {
         public List<Room> Rooms { get; set; } = new List<Room>();
-        public Dictionary<int, List<int>> RoomNeighbors { get; set; }
-        public Dictionary<int, List<int>> RoomConnections { get; set; }
+        public Dictionary<int, List<int>> RoomNeighbors { get; set; } = new Dictionary<int, List<int>>();
+        public Dictionary<int, List<int>> RoomConnections { get; set; } = new Dictionary<int, List<int>>();
         public int Number { get; set; }
         public int Size { get; set; }
         public Cave(int caveNumber)
         {
+            if (caveNumber < 0)
+                return;
+
             Number = caveNumber;
             for (var i = 1; i < 31; i++)
             {
