@@ -6,6 +6,7 @@
         public Dictionary<int, List<int>> RoomNeighbors { get; set; }
         public Dictionary<int, List<int>> RoomConnections { get; set; }
         public int Number { get; set; }
+        public int Size { get; set; }
         public Cave(int caveNumber)
         {
             Number = caveNumber;
@@ -19,6 +20,8 @@
 
             RoomConnections = new Dictionary<int, List<int>>();
             SetConnections();
+
+            Size = GetRoomNumbers(Rooms).Count;
 
         }
         public void SetNeighbors()
