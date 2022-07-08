@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HuntTheWumpus.Models.Hazards;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,25 +9,19 @@ namespace HuntTheWumpus.Models
 {
     public class GameControl
     {
-        public string Winner { get; set; }
-        public string Loser { get; set; }
         public GameAudio GameAudio { get; set; }
         public HighScore HighScore { get; set; } = new HighScore();
-        public int ThemeChoice { get; set; }
-        public GameControl(int theme)
+        public Bat Bat { get; set; }
+        public Wumpus Wumpus { get; set; }
+        public Pitfall Pitfall { get; set; }
+        public Theme Theme { get; set; }
+        public GameControl(Theme theme)
         {
-            ThemeChoice = theme;
-            GameAudio = new GameAudio(ThemeChoice);
-            Winner = "\nCongrats! You have defeated the Wumpus!\n";
-            Loser = "\nGood job! The Wumpus has defeated you!\n";
-
-            //Baddie Theme
-            if (theme == 2)
-            {
-                Winner = "\nCongrats! Your Baddie has decided to take you back!\n";
-                Loser = "\nGood job! Your Baddie has left you saying they're out of your league!\n";
-            }
-
+            Theme = theme;
+            Wumpus = theme.GetWumpusObject();
+            Bat = theme.GetBatObject();
+            Pitfall = theme.GetPitfallObject();
+            GameAudio = new GameAudio(theme.Name);
         }
         public void PlayOpeningAudio()
         {
@@ -64,13 +59,9 @@ namespace HuntTheWumpus.Models
 
         public List<string> DisplayGameMenu()
         {
-            var gameName = "Hunt The Wumpus";
-            if (ThemeChoice == 2)
-                gameName = "Find The Baddie";
-
             var lines = new List<string>() {
                 "*********************************************************************************\n",
-                "                 Welcome To '" + gameName + "' By ZestyTS\n",
+                "                 Welcome To '" + Theme.GameName + "' By ZestyTS\n",
                 "\n",
                 "                                   Game Menu\n",
                 "*********************************************************************************\n",

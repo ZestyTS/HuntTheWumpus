@@ -15,11 +15,11 @@ namespace HuntTheWumpus.Controller
         private static int CaveSize { get; set; }
         private static int StartingRoom { get; set; } = 1;
         private static int ThemeChoice { get; set; } = 1;
-        private static GameControl GameControl { get; set; } = new GameControl(0);
+        private static GameControl GameControl { get; set; } = new GameControl(new Theme(1));
         private static Trivia Trivia { get; set; } = new Trivia();
         public static void GameSetup()
         {
-            GameControl = new GameControl(ThemeChoice);
+            GameControl = new GameControl(new Theme(ThemeChoice));
             GameControl.PlayOpeningAudio();
             GameMenu();
         }
@@ -74,9 +74,6 @@ namespace HuntTheWumpus.Controller
         }
         private static void Start()
         {
-            var bat = new Bat(ThemeChoice);
-            var pitfall = new Pitfall(ThemeChoice);
-            var wumpus = new Wumpus(ThemeChoice);
             GameControl.PlayAmbientAudio(0);
 
             TriviaQuestions = new List<int>();
@@ -95,7 +92,7 @@ namespace HuntTheWumpus.Controller
             Cave.Rooms[gameLocation.WumpusLocation].Wumpus = true;
             Cave.Rooms[gameLocation.PitfallLocations[0]].Pit = true;
             Cave.Rooms[gameLocation.PitfallLocations[1]].Pit = true;
-            wumpus.Location = gameLocation.WumpusLocation;
+            GameControl.Wumpus.Location = gameLocation.WumpusLocation;
 
             Console.Clear();
             while (!Player.IsDead)
@@ -106,10 +103,10 @@ namespace HuntTheWumpus.Controller
                 var connected = Cave.GetConnections(Player.Location);
                 var connectedNums = Cave.GetRoomNumbers(connected);
 
-                wumpus.RoundMove(Cave.GetRoomNumbers(Cave.GetConnections(gameLocation.WumpusLocation)), Cave.GetRoomNumbers(Cave.Rooms));
-                gameLocation.WumpusLocation = wumpus.Location;
+                GameControl.Wumpus.RoundMove(Cave.GetRoomNumbers(Cave.GetConnections(gameLocation.WumpusLocation)), Cave.GetRoomNumbers(Cave.Rooms));
+                gameLocation.WumpusLocation = GameControl.Wumpus.Location;
 
-                var warning = gameLocation.BuildWarningString(neighbors, bat, pitfall, wumpus);
+                var warning = gameLocation.BuildWarningString(neighbors, GameControl.Bat, GameControl.Pitfall, GameControl.Wumpus);
                 if (!string.IsNullOrEmpty(warning))
                     Console.WriteLine(warning + "\n");
 
@@ -120,10 +117,10 @@ namespace HuntTheWumpus.Controller
 
                 if (gameLocation.WumpusLocation == gameLocation.PlayerLocation)
                 {
-                    Console.WriteLine("The " + wumpus.Name + " snuck up on you!");
-                    if (!SurviveWumpusAttack(wumpus))
+                    Console.WriteLine("The " + GameControl.Wumpus.Name + " snuck up on you!");
+                    if (!SurviveWumpusAttack(GameControl.Wumpus))
                     {
-                        Save(Player, Cave.Number, wumpus.IsDead);
+                        Save(Player, Cave.Number, GameControl.Wumpus.IsDead);
                         Loser();
                         GameEnd(Player);
                     }
@@ -140,14 +137,14 @@ namespace HuntTheWumpus.Controller
 
                         if (gameLocation.DidArrowHitWumpus(target))
                         {
-                            Save(Player, Cave.Number, wumpus.IsDead);
+                            Save(Player, Cave.Number, GameControl.Wumpus.IsDead);
                             WinRar();
                             GameEnd(Player);
                         }
                         else
                         {
-                            if (wumpus.State == Wumpus.WumpusState.Sleep)
-                                wumpus.Move(2);
+                            if (GameControl.Wumpus.State == Wumpus.WumpusState.Sleep)
+                                GameControl.Wumpus.Move(2);
                         }
                         break;
                     case "M":
@@ -162,7 +159,7 @@ namespace HuntTheWumpus.Controller
                         var currentRoom = Cave.Rooms[gameLocation.PlayerLocation-1];
                         var hazard = gameLocation.CheckIfRoomHasHazard(currentRoom);
 
-                        HazardAction(hazard, wumpus, pitfall, bat);
+                        HazardAction(hazard, GameControl.Wumpus, GameControl.Pitfall, GameControl.Bat);
                         gameLocation.PlayerLocation = Player.Location;
                         break;
                     case "A":
@@ -199,10 +196,10 @@ namespace HuntTheWumpus.Controller
 
                             var wumpusInfo = new List<string>()
                             {
-                                "The " + wumpus.Name + " is in room " + gameLocation.WumpusLocation,
-                                "The " + wumpus.Name + " is " + (wumpus2Away == true ? "" : "not ") + " two rooms away",
-                                "The " + wumpus.Name + " is currently " + (wumpus.State != Wumpus.WumpusState.Moving ? "not " : "") + "moving around",
-                                "The " + wumpus.Name + " is still alive"
+                                "The " + GameControl.Wumpus.Name + " is in room " + gameLocation.WumpusLocation,
+                                "The " + GameControl.Wumpus.Name + " is " + (wumpus2Away == true ? "" : "not ") + " two rooms away",
+                                "The " + GameControl.Wumpus.Name + " is currently " + (GameControl.Wumpus.State != Wumpus.WumpusState.Moving ? "not " : "") + "moving around",
+                                "The " + GameControl.Wumpus.Name + " is still alive"
                             };
                             foreach (var room in Cave.Rooms)
                                 if (room.Bat)
@@ -215,10 +212,10 @@ namespace HuntTheWumpus.Controller
                             switch (ranNum)
                             {
                                 case 0:
-                                    Console.WriteLine("A " + bat.Name + " can be found in room " + batLocations[ran.Next(0, 1)]);
+                                    Console.WriteLine("A " + GameControl.Bat.Name + " can be found in room " + batLocations[ran.Next(0, 1)]);
                                     break;
                                 case 1:
-                                    Console.WriteLine("A " + pitfall.Name + " can be found in room " + pitLocations[ran.Next(0,1)]);
+                                    Console.WriteLine("A " + GameControl.Pitfall.Name + " can be found in room " + pitLocations[ran.Next(0,1)]);
                                     break;
                                 case 2:
                                     Console.WriteLine(playerInfo[ran.Next(0, 5)]);
@@ -278,7 +275,7 @@ namespace HuntTheWumpus.Controller
         private static void EndingText()
         {
             GameControl.PlayEndingAudio(Player.IsDead);
-            DisplayToConsoleAsTypeWriter(Player.IsDead ? GameControl.Winner : GameControl.Loser);
+            DisplayToConsoleAsTypeWriter(Player.IsDead ? GameControl.Theme.Winner : GameControl.Theme.Loser);
         }
 
         private static void Save(Player player, int caveNumber, bool wumpusDead)

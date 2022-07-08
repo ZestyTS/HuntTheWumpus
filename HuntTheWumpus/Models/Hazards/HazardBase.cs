@@ -14,6 +14,6 @@
             Bat = 2,
             Pitfall = 3
         }
-        public HazardBase(int theme) { }
+        public HazardBase(string name, string warning, string enterSpeech) { }
     }
 }

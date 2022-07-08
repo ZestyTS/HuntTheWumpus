@@ -10,7 +10,6 @@ namespace HuntTheWumpus.Models.Hazards
     {
         public abstract int TriviaBattleMax { get; }
         public abstract int TriviaBattleMin { get; }
-        protected TriviaHazardBase(int theme) : base(theme) { }
-
+        protected TriviaHazardBase(string name, string warning, string enterSpeech) : base(name, warning, enterSpeech) { }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace HuntTheWumpus.Models.Hazards
 {
-    internal class Pitfall : TriviaHazardBase
+    public class Pitfall : TriviaHazardBase
     {
         public override string Name { get; set; }
         public override string Warning { get; set; }
@@ -9,19 +9,11 @@
         public override int TriviaBattleMax { get; } = 3;
         public override int TriviaBattleMin { get; } = 2;
 
-        public Pitfall(int theme) : base(theme)
+        public Pitfall(string name, string warning, string enterSpeech) : base(name, warning, enterSpeech)
         {
-            Name = "Pitfall";
-            Warning = "I feel a draft";
-            EnterSpeech = "You walked into a room with a pit!";
-
-            if (theme == 1)
-            {
-                Name = "Spilled Juice";
-                Warning = "You can smell something";
-                EnterSpeech = "You slipped on " + Name.ToLower() + "!";
-            }
-
+            Name = name;
+            Warning = warning;
+            EnterSpeech = enterSpeech;
             ImagePath = "Media/Images/" + Name.ToLower() + "/.png";
         }
     }

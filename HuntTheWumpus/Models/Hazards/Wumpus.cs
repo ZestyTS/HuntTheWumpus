@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models.Hazards
+﻿namespace HuntTheWumpus.Models.Hazards
 {
-    internal class Wumpus : TriviaHazardBase
+    public class Wumpus : TriviaHazardBase
     {
         public override int TriviaBattleMax { get; } = 5;
         public override int TriviaBattleMin { get; } = 3;
@@ -21,24 +15,15 @@ namespace HuntTheWumpus.Models.Hazards
         public WumpusState State { get; set; } = WumpusState.Sleep;
         public int TurnMoveCounter { get; set; } = 1;
         public bool ActiveWumpus { get; set; } = false;
-        public Wumpus(int theme) : base(theme)
+        public Wumpus(string name, string warning, string enterSpeech) : base(name, warning, enterSpeech)
         {
-            //Default theme (Wumpus)
-            Name = "Wumpus";
-            Warning = "I smell a Wumpus!";
-            EnterSpeech = "~Me me me me me~\n~I am the Great Mighty Wumpus and I'm going to test your trivia~\n~You might think you're all that with that puny brain of yours~\n~You are in my lair so it's time to see how you fair~\n";
-
-            //Baddie Theme
-            if (theme == 2)
-            {
-                Name = "Baddie";
-                Warning = "I can sense my Baddie is nearby!";
-                EnterSpeech = "~Why why why why why~\n~Must you always chase me down when you know that when I'm ready I'll go to you~\n~It's clear you don't know anything so how about a little game~\nIf you win I'll let you go, if you lose it'll be your end, but it's time to see how you fair~\n";
-            }
-
+            Name = name;
+            EnterSpeech = enterSpeech;
+            Warning = warning;
             ImagePath = "/Media/Images/" + Name.ToLower() + ".png";
             SneakSpeech = "The " + Name + " snuck up on you!";
         }
+
         public enum WumpusState
         {
             Sleep = 0,
@@ -75,9 +60,7 @@ namespace HuntTheWumpus.Models.Hazards
             if (MoveCounter == 0)
                 State = WumpusState.Awake;
 
-
             Location = connectedRooms[moveTo];
-
         }
 
         public void RoundMove(List<int> connectedRooms, List<int> rooms)
@@ -111,6 +94,5 @@ namespace HuntTheWumpus.Models.Hazards
 
             TurnMoveCounter = 1;
         }
-
     }
 }
