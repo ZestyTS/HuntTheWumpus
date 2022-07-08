@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace HuntTheWumpus.Models
 {
-    internal class Trivia
+    public class Trivia
     {
         public string Question { get; set; } = string.Empty;
         public string[] AnswerKey { get; set; } = Array.Empty<string>();
         public int Answer { get; set; }
         string Location { get; set; } = @"DataFiles/TriviaQuestions.txt";
         public List<int> UsedTriviaQuestions { get; set; } = new List<int>();
-       
 
         public void Save()
         {
