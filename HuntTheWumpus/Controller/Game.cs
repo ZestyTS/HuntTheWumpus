@@ -1,42 +1,32 @@
 ﻿using HuntTheWumpus.Helper;
 using HuntTheWumpus.Models;
+using HuntTheWumpus.Models.Hazards;
+using ManagedBass;
 using System.Media;
-using static HuntTheWumpus.Models.Hazard;
+using static HuntTheWumpus.Models.Hazards.HazardBase;
 
 namespace HuntTheWumpus.Controller
 {
     public static class Game
     {
-        public static Player Player { get; set; }
-        public static Cave Cave { get; set; }
-        public static List<int> TriviaQuestions { get; set; } = new List<int>();
-        public static int CaveSize { get; set; }
-        public static int StartingRoom { get; set; } = 1;
+        private static Player Player { get; set; } = new Player(string.Empty);
+        private static Cave Cave { get; set; } = new Cave(-1);
+        private static List<int> TriviaQuestions { get; set; } = new List<int>();
+        private static int CaveSize { get; set; }
+        private static int StartingRoom { get; set; } = 1;
         private static int ThemeChoice { get; set; } = 1;
-        private static GameAudio GameAudio { get; set; }
-        private static SoundPlayer SoundPlayer { get; set; }
+        private static GameControl GameControl { get; set; } = new GameControl(0);
+        private static Trivia Trivia { get; set; } = new Trivia();
         public static void GameSetup()
         {
-            GameAudio = new GameAudio(ThemeChoice);
-            PlayAudio(GameAudio.Opening);
-
+            GameControl = new GameControl(ThemeChoice);
+            GameControl.PlayOpeningAudio();
             GameMenu();
         }
         public static void GameMenu()
         {
-            DisplayToConsoleAsTypeWriter("*********************************************************************************\n");
-            DisplayToConsoleAsTypeWriter("                 Welcome To 'Hunt The " + (ThemeChoice == 1 ? "Wumpus" : "Baddie") + "' By Mr Fernandez\n");
-            Console.WriteLine();
-            DisplayToConsoleAsTypeWriter("                                   Game Menu\n");
-            DisplayToConsoleAsTypeWriter("*********************************************************************************\n");
-            Console.WriteLine();
-            DisplayToConsoleAsTypeWriter("            [1]  Display Rules\n");
-            DisplayToConsoleAsTypeWriter("            [2]  Start Game\n");
-            DisplayToConsoleAsTypeWriter("            [3]  Select Theme\n");
-            DisplayToConsoleAsTypeWriter("            [4]  View HighScores\n");
-            DisplayToConsoleAsTypeWriter("            [5]  Quit\n");
-            Console.WriteLine();
-            DisplayToConsoleAsTypeWriter("Selection: ");
+            foreach(var line in GameControl.DisplayGameMenu())
+                DisplayToConsoleAsTypeWriter(line);
 
             var selection = UserInput.GetInteger(1, 5);
             switch (selection)
@@ -53,21 +43,9 @@ namespace HuntTheWumpus.Controller
                     GameSetup();
                     break;
                 case 4:
-                    var highScores = new HighScore().GetHighScores();
-                    var i = 1;
-                    foreach (var highScore in highScores) {
-                        Console.WriteLine("Position: " + i);
-                        Console.WriteLine("Name: " + highScore.Name);
-                        Console.WriteLine("Cave: " + highScore.CaveNumber);
-                        Console.WriteLine("Score: " + highScore.Score);
-                        Console.WriteLine("Arrows: " + highScore.Arrows);
-                        Console.WriteLine("Gold: " + highScore.Gold);
-                        Console.WriteLine("Turns: " + highScore.Turns);
-                        Console.WriteLine("Wumpus Defeated: " + highScore.WumpusDefeated);
-                        Console.WriteLine("DateTime: " + highScore.DateTime.ToString());
-                        Console.WriteLine();
-                        i++;
-                    }
+                    foreach (var leaderBoard in GameControl.GetLeaderboard())
+                        Console.WriteLine(leaderBoard);
+
                     Console.WriteLine("Press a button to continue,");
                     Console.ReadKey();
                     Console.Clear();
@@ -96,23 +74,10 @@ namespace HuntTheWumpus.Controller
         }
         private static void Start()
         {
-            var bat = new Bat();
-            var pitfall = new Pitfall();
-            var wumpus = new Wumpus();
-            PlayAudio(GameAudio.Ambients[0]);
-
-            if (ThemeChoice == 2)
-            {
-                wumpus.Name = "Baddie";
-                wumpus.Warning = "I can sense my Baddie is nearby!";
-                wumpus.Song = "~Why why why why why~\n~Must you always chase me down when you know that when I'm ready I'll go to you~\n~It's clear you don't know anything so how about a little game~\nIf you win I'll let you go, if you lose it'll be your end, but it's time to see how you fair~\n";
-
-                bat.Name = "Fake Baddies";
-                bat.Warning = "You can hear some annoying voices.";
-
-                pitfall.Name = "Spilled Juice";
-                pitfall.Warning = "You can smell something.";
-            }
+            var bat = new Bat(ThemeChoice);
+            var pitfall = new Pitfall(ThemeChoice);
+            var wumpus = new Wumpus(ThemeChoice);
+            GameControl.PlayAmbientAudio(0);
 
             TriviaQuestions = new List<int>();
             StartRequirements();
@@ -135,8 +100,7 @@ namespace HuntTheWumpus.Controller
             Console.Clear();
             while (!Player.IsDead)
             {
-                if (SoundPlayer.SoundLocation != GameAudio.Ambients[0])
-                    PlayAudio(GameAudio.Ambients[0]);
+                GameControl.PlayAmbientAudio(0);
 
                 var neighbors = Cave.GetNeighbors(Player.Location);
                 var connected = Cave.GetConnections(Player.Location);
@@ -156,18 +120,17 @@ namespace HuntTheWumpus.Controller
 
                 if (gameLocation.WumpusLocation == gameLocation.PlayerLocation)
                 {
-                    
                     Console.WriteLine("The " + wumpus.Name + " snuck up on you!");
                     if (!SurviveWumpusAttack(wumpus))
                     {
                         Save(Player, Cave.Number, wumpus.IsDead);
-                        Loser(wumpus.Name);
+                        Loser();
                         GameEnd(Player);
                     }
                 }
 
                 var input = UserInput.UserAction(Player.Arrow);
-                var target = -1;
+                int target;
                 switch (input)
                 {
                     case "S":
@@ -178,7 +141,7 @@ namespace HuntTheWumpus.Controller
                         if (gameLocation.DidArrowHitWumpus(target))
                         {
                             Save(Player, Cave.Number, wumpus.IsDead);
-                            WinRar(wumpus.Name);
+                            WinRar();
                             GameEnd(Player);
                         }
                         else
@@ -301,20 +264,21 @@ namespace HuntTheWumpus.Controller
                 Thread.Sleep(15);
             }
         }
-        private static void WinRar(string name)
+        private static void WinRar()
         {
-            PlayAudio(GameAudio.Win);
-            DisplayToConsoleAsTypeWriter("\n");
-            DisplayToConsoleAsTypeWriter("Congrats! You have defeated the " + name + "!\n");
-
+            EndingText();
         }
 
-        private static void Loser(string name)
+        private static void Loser()
         {
-            PlayAudio(GameAudio.Lose);
             Player.IsDead = true;
-            DisplayToConsoleAsTypeWriter("\n");
-            DisplayToConsoleAsTypeWriter("Good job! The " + name + " has defeated you!\n");
+            EndingText();
+        }
+
+        private static void EndingText()
+        {
+            GameControl.PlayEndingAudio(Player.IsDead);
+            DisplayToConsoleAsTypeWriter(Player.IsDead ? GameControl.Winner : GameControl.Loser);
         }
 
         private static void Save(Player player, int caveNumber, bool wumpusDead)
@@ -349,13 +313,13 @@ namespace HuntTheWumpus.Controller
         {
             Console.WriteLine();
             Console.Write(wumpus.Name + ": ");
-            DisplayToConsoleAsTypeWriter(wumpus.Song);
+            DisplayToConsoleAsTypeWriter(wumpus.EnterSpeech);
             Console.WriteLine();
         }
 
         private static bool SurviveWumpusAttack(Wumpus wumpus)
         {
-            PlayAudio(GameAudio.Ambients[1]);
+            GameControl.PlayAmbientAudio(1);
 
             WumpusSinging(wumpus);
             return WonTrivia(wumpus.TriviaBattleMin, wumpus.TriviaBattleMax);
@@ -363,14 +327,10 @@ namespace HuntTheWumpus.Controller
 
         private static bool SurvivePitfall(Pitfall pitfall)
         {
-            PlayAudio(GameAudio.Ambients[1]);
+            GameControl.PlayAmbientAudio(1);
 
             Console.WriteLine();
-
-            if (pitfall.Name == "pitfall")
-                Console.WriteLine("You walked into a room with a " + pitfall.Name + "!");
-            else
-                Console.WriteLine("You slipped on " + pitfall.Name + "!");
+            Console.WriteLine(pitfall.EnterSpeech);
 
             var winTrivia = WonTrivia(pitfall.TriviaBattleMin, pitfall.TriviaBattleMax);
             if (winTrivia)
@@ -380,15 +340,11 @@ namespace HuntTheWumpus.Controller
         }
         private static void BatAttack(Bat bat) 
         {
-            PlayAudio(GameAudio.Ambients[1]);
+            GameControl.PlayAmbientAudio(1);
 
             Console.WriteLine();
-
-            if (bat.Name == "Bats")
-                Console.WriteLine("You walked into a room with bats and got sweeped away!");
-            else
-                Console.WriteLine("You walked into a room with a " + bat.Name + "! They screamed like a banshee so you ran away!");
-
+            Console.WriteLine(bat.EnterSpeech);
+            
             var random = new Random();
             int next;
             for (var i = 0; i < Cave.Rooms.Count; i++)
@@ -414,7 +370,7 @@ namespace HuntTheWumpus.Controller
 
         private static bool WonTrivia(int min, int max, bool forced = true)
         {
-            var triviaDict = new Trivia().SetupTriviaBattle(max, TriviaQuestions);
+            var triviaDict = Trivia.SetupTriviaBattle(max);
             var trivias = new List<Trivia>();
 
             foreach(var trivia in triviaDict)
@@ -422,7 +378,6 @@ namespace HuntTheWumpus.Controller
                 TriviaQuestions.Add(trivia.Key);
                 trivias.Add(trivia.Value);
             }
-
 
             return TriviaBattle(min, trivias, forced);
         }
@@ -446,7 +401,7 @@ namespace HuntTheWumpus.Controller
             if (isDead)
             {
                 Save(Player, Cave.Number, wumpus.IsDead);
-                Loser(wumpus.Name);
+                Loser();
                 GameEnd(Player);
             }
         }
@@ -482,26 +437,12 @@ namespace HuntTheWumpus.Controller
         private static void TriviaHint()
         {
             Console.WriteLine("You've stepped on a piece of paper, it reads:");
-            var trivias = new Trivia().GetTrivias();
+            var trivias = Trivia.GetTrivias();
             var random = new Random();
             var num = random.Next(trivias.Count);
             var trivia = trivias[num];
             Console.WriteLine(trivia.Question);
             Console.WriteLine(trivia.AnswerKey[trivia.Answer-1]);
-        }
-
-        private static void PlayAudio(string soundLocation)
-        {
-            if (SoundPlayer == null)
-                SoundPlayer = new SoundPlayer(soundLocation);
-            else
-            {
-                SoundPlayer.Stop();
-                SoundPlayer.SoundLocation = soundLocation;
-            }
-
-            SoundPlayer.PlayLooping();
-
         }
 
         private static void ImageDisplayer()
