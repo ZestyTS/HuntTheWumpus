@@ -9,7 +9,7 @@
         public int Size { get; set; }
         public Cave(int caveNumber)
         {
-            if (caveNumber < 0)
+            if (caveNumber < 1)
                 return;
 
             Number = caveNumber;
@@ -26,7 +26,7 @@
 
             Size = GetRoomNumbers(Rooms).Count;
         }
-        public void SetNeighbors()
+        private void SetNeighbors()
         {
             //TODO: write an algorithm to figure out how rooms should be connected
             RoomNeighbors = GetRoomDataFromFile("DataFiles/CaveNeighbors.txt");
@@ -44,7 +44,7 @@
 
             return neighbors;
         }
-        public void SetConnections()
+        private void SetConnections()
         {
             RoomConnections = GetRoomDataFromFile("DataFiles/Cave" + Number + ".txt");
         }

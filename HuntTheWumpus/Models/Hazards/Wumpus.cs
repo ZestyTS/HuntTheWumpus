@@ -34,7 +34,7 @@
         {
             State = WumpusState.Moving;
             var random = new Random();
-            MoveCounter += random.Next(moveUpTo);
+            MoveCounter += random.Next(0,moveUpTo);
         }
         public void NewLocation(List<int> connectedRooms)
         {

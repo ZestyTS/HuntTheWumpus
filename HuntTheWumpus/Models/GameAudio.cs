@@ -9,7 +9,6 @@ namespace HuntTheWumpus.Models
         public string Lose { get; set; }
         public string[] Ambients { get; set; }
         public string Opening { get; set; }
-        private int Stream { get; set; }
 
         public GameAudio(string name)
         {

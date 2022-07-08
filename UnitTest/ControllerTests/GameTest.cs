@@ -1,5 +1,5 @@
 using HuntTheWumpus.Controller;
-namespace UnitTest.ControllerTest
+namespace UnitTest.ControllerTests
 {
     [TestClass]
     public class GameTest

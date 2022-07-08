@@ -1,11 +1,4 @@
-﻿using HuntTheWumpus.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Helper
+﻿namespace HuntTheWumpus.Helper
 {
     public static class UserInput
     {
@@ -14,9 +7,7 @@ namespace HuntTheWumpus.Helper
             while (true)
             {
                 int xPos = Console.CursorLeft;
-                var input = Console.ReadLine();
-                if (input == null)
-                    continue;
+                var input = Console.ReadLine();                  
 
                 try
                 {
