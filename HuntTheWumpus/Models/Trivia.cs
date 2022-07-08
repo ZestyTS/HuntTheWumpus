@@ -12,6 +12,7 @@ namespace HuntTheWumpus.Models
         public string[] AnswerKey { get; set; } = Array.Empty<string>();
         public int Answer { get; set; }
         string Location { get; set; } = @"DataFiles/TriviaQuestions.txt";
+        public List<int> UsedTriviaQuestions { get; set; } = new List<int>();
        
 
         public void Save()
@@ -33,6 +34,8 @@ namespace HuntTheWumpus.Models
                 while (!reader.EndOfStream)
                 {
                     var question = reader.ReadLine();
+                    if (string.IsNullOrEmpty(question))
+                        continue;
 
                     var answerKey = new string[4];
                     for (var i = 0; i < 4; i++)
@@ -53,7 +56,7 @@ namespace HuntTheWumpus.Models
             }
             return trivias;
         }
-        public Dictionary<int, Trivia> SetupTriviaBattle(int max, List<int> UsedTriviaQuestions)
+        public Dictionary<int, Trivia> SetupTriviaBattle(int max)
         {
             var trivias = new List<Trivia>();
             trivias.AddRange(new Trivia().GetTrivias());

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
     public class Cave
     {
@@ -78,10 +72,13 @@ namespace HuntTheWumpus.Models
                 var i = 1;
                 while (!streamReader.EndOfStream)
                 {
-                    roomData.Add(i, streamReader.ReadLine().Split(',').Select(int.Parse).ToList());
+                    var line = streamReader.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    roomData.Add(i, line.Split(',').Select(int.Parse).ToList());
                     i++;
                 }
-
             }
             return roomData;
         }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
-    internal class HighScore
+    public class HighScore
     {
         public DateTime DateTime { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -63,7 +57,11 @@ namespace HuntTheWumpus.Models
             {
                 while (!reader.EndOfStream)
                 {
-                    var highScoreSplit = reader.ReadLine().Split(',');
+                    var line = reader.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    var highScoreSplit = line.Split(',');
                     var highScore = new HighScore
                     {
                         Name = highScoreSplit[0],
