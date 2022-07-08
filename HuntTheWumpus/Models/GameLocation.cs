@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HuntTheWumpus.Models.Hazards;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static HuntTheWumpus.Models.Hazard;
+using static HuntTheWumpus.Models.Hazards.HazardBase;
 
 namespace HuntTheWumpus.Models
 {
