@@ -8,7 +8,7 @@ using static HuntTheWumpus.Models.Hazards.HazardBase;
 
 namespace HuntTheWumpus.Models
 {
-    internal class GameLocation
+    public class GameLocation
     {
         public int PlayerLocation { get; set; }
         public int WumpusLocation { get; set; }
@@ -17,6 +17,9 @@ namespace HuntTheWumpus.Models
 
         public GameLocation(List<Room> rooms)
         {
+            if (rooms?.Count == 0 || rooms == null)
+                return;
+
             var random = new Random();
             var hazardLocations = new List<int>();
 
