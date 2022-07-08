@@ -15,6 +15,10 @@ namespace HuntTheWumpus.Models
         public Wumpus Wumpus { get; set; }
         public Pitfall Pitfall { get; set; }
         public Theme Theme { get; set; }
+        public Trivia Trivia { get; set; } = new Trivia();
+        public Cave Cave { get; set; } = new Cave(-1);
+        public Player Player { get; set; } = new Player("");
+        public GameLocation GameLocation { get; set; } = new GameLocation(new List<Room>());
         public GameControl(Theme theme)
         {
             Theme = theme;
@@ -77,6 +81,137 @@ namespace HuntTheWumpus.Models
 
             return lines;
         }
+        public List<Trivia> SetupTriviaBattle(int max = 3)
+        {
+            var triviaDict = Trivia.SetupTriviaBattle(max);
+            var trivias = new List<Trivia>();
 
+            foreach (var trivia in triviaDict)
+            {
+                Trivia.UsedTriviaQuestions.Add(trivia.Key);
+                trivias.Add(trivia.Value);
+            }
+            return trivias;
+        }
+        public Trivia GetTriviaHint()
+        {
+            var trivias = Trivia.GetTrivias();
+            var random = new Random();
+            var num = random.Next(trivias.Count);
+            var trivia = trivias[num];
+            return trivia;
+        }
+
+        public string GetSecret()
+        {
+            var batLocations = new List<int>();
+            var pitLocations = new List<int>();
+            var playerInfo = new List<string>()
+            {
+                "You are in room " + Player.Location,
+                "You currently have " + Player.Gold + " gold",
+                "You currently have " + Player.Arrow + " arrows",
+                "You have not died, yet",
+                "You are in Cave " + Cave.Number
+            };
+            var wumpus2Away = false;
+            foreach (var room in Cave.GetConnections(Player.Location))
+            {
+                foreach (var neighbor in Cave.GetNeighbors(room.Name))
+                {
+                    if (neighbor.Wumpus)
+                    {
+                        wumpus2Away = true;
+                        break;
+                    }
+                }
+                if (wumpus2Away)
+                    break;
+            }
+
+            var wumpusInfo = new List<string>()
+            {
+                "The " + Wumpus.Name + " is in room " + Wumpus.Location,
+                "The " + Wumpus.Name + " is " + (wumpus2Away == true ? "" : "not ") + " two rooms away",
+                "The " + Wumpus.Name + " is currently " + (Wumpus.State != Wumpus.WumpusState.Moving ? "not " : "") + "moving around",
+                "The " + Wumpus.Name + " is still alive"
+            };
+            foreach (var room in Cave.Rooms)
+                if (room.Bat)
+                    batLocations.Add(room.Name);
+                else if (room.Pit)
+                    pitLocations.Add(room.Name);
+
+            var ran = new Random();
+            var ranNum = ran.Next(0, 4);
+
+            switch (ranNum)
+            {
+                case 0:
+                    return "A " + Bat.Name + " can be found in room " + batLocations[ran.Next(0, 1)];
+                case 1:
+                    return "A " + Pitfall.Name + " can be found in room " + pitLocations[ran.Next(0, 1)];
+                case 2:
+                    return playerInfo[ran.Next(0, 5)];
+                case 3:
+                    return wumpusInfo[ran.Next(0, 3)];
+                case 4:
+                    return "null";
+            }
+            return "There are no secrets available!";
+        }
+        public void BatAttack(int caveSize)
+        {
+            var random = new Random();
+            int next;
+            for (var i = 0; i < Cave.Rooms.Count; i++)
+            {
+                next = random.Next(caveSize);
+                if (!Cave.Rooms[next].Bat && !Cave.Rooms[next].Pit && next != Player.Location)
+                {
+                    Cave.Rooms[Player.Location].Bat = false;
+                    Cave.Rooms[next].Bat = true;
+                    break;
+                }
+            }
+            for (var i = 0; i < Cave.Rooms.Count; i++)
+            {
+                next = random.Next(caveSize);
+                if (Player.Location != next)
+                {
+                    Player.Location = next;
+                    break;
+                }
+            }
+        }
+        public void GameEndSave()
+        {
+            Player.CalculateScore(Wumpus.IsDead);
+            var highScore = new HighScore
+            {
+                Score = Player.Score,
+                CaveNumber = Cave.Number,
+                Name = Player.Name,
+                Arrows = Player.Arrow,
+                Gold = Player.Gold,
+                Turns = Player.Movement,
+                WumpusDefeated = Wumpus.IsDead
+            };
+
+            highScore.Save();
+        }
+        public void GameSetup()
+        {
+            Player.Location = 1;
+            GameLocation = new GameLocation(Cave.Rooms);
+            GameLocation.PlayerLocation = 1;
+
+            Cave.Rooms[GameLocation.BatLocations[0]].Bat = true;
+            Cave.Rooms[GameLocation.BatLocations[1]].Bat = true;
+            Cave.Rooms[GameLocation.WumpusLocation].Wumpus = true;
+            Cave.Rooms[GameLocation.PitfallLocations[0]].Pit = true;
+            Cave.Rooms[GameLocation.PitfallLocations[1]].Pit = true;
+            Wumpus.Location = GameLocation.WumpusLocation;
+        }
     }
 }
