@@ -14,7 +14,10 @@ namespace HuntTheWumpus.Helper
             while (true)
             {
                 int xPos = Console.CursorLeft;
-                string input = Console.ReadLine();
+                var input = Console.ReadLine();
+                if (input == null)
+                    continue;
+
                 try
                 {
                     if (int.TryParse(input, out int number))
@@ -29,7 +32,7 @@ namespace HuntTheWumpus.Helper
                 {
                     Console.WriteLine($"Error: {input} is not a valid selection.  Press any key to continue.");
                     Console.ReadKey();
-                    ClearInput(input, xPos);
+                    ClearInput(xPos);
                 }
             }
         }
@@ -38,7 +41,10 @@ namespace HuntTheWumpus.Helper
             while (true)
             {
                 int xPos = Console.CursorLeft;
-                string input = Console.ReadLine();
+                var input = Console.ReadLine();
+                if (input == null)
+                    continue;
+
                 try
                 {
                     if (!string.IsNullOrEmpty(input))
@@ -50,11 +56,11 @@ namespace HuntTheWumpus.Helper
                 {
                     Console.WriteLine($"Error: input is empty or null.  Press any key to continue.");
                     Console.ReadKey();
-                    ClearInput(input, xPos);
+                    ClearInput(xPos);
                 }
             }
         }
-        public static void ClearInput(string input, int cursorPos)
+        public static void ClearInput(int cursorPos)
         {
             int y = Console.CursorTop - 1;
             Console.SetCursorPosition(0, y);
@@ -73,6 +79,9 @@ namespace HuntTheWumpus.Helper
             while (true)
             {
                 var input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
+                    continue;
+
                 try
                 {
                     if (arrowQuantity > 0)
@@ -102,7 +111,7 @@ namespace HuntTheWumpus.Helper
                 {
                     Console.WriteLine($"Error. {input} is not a valid selection.  Press any key to continue");
                     Console.ReadKey();
-                    ClearInput(input, xPos);
+                    ClearInput(xPos);
                 }
             }
         }
@@ -131,7 +140,7 @@ namespace HuntTheWumpus.Helper
                 {
                     Console.WriteLine($"\tError: {input} is not a valid selection.  Press any key to continue.");
                     Console.ReadKey();
-                    ClearInput(input, xPos);
+                    ClearInput(xPos);
                 }
             }
         }
