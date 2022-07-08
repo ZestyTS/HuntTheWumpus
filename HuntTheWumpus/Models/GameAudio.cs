@@ -1,9 +1,4 @@
-﻿using ManagedBass;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NAudio.Wave;
 
 namespace HuntTheWumpus.Models
 {
@@ -28,17 +23,18 @@ namespace HuntTheWumpus.Models
         }
         public void PlayAudio(string soundLocation)
         {
-            if (Bass.Init())
+            try
             {
-                Stream = Bass.CreateStream(soundLocation);
-                if (Stream != 0)
-                    Bass.ChannelPlay(Stream);
+                var audioFile = new AudioFileReader(soundLocation);
+                var outputDevice = new WaveOutEvent();
+
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
             }
-            else
+            catch
             {
-                Bass.StreamFree(Stream);
-                Bass.Free();
-                PlayAudio(soundLocation);
+                //Something is wrong with audio
+                //So continue running with no audio
             }
         }
     }
