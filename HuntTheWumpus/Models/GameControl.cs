@@ -1,9 +1,4 @@
 ﻿using HuntTheWumpus.Models.Hazards;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HuntTheWumpus.Models
 {
@@ -157,6 +152,8 @@ namespace HuntTheWumpus.Models
                     return wumpusInfo[ran.Next(0, 3)];
                 case 4:
                     return "null";
+                default:
+                    break;
             }
             return "There are no secrets available!";
         }
