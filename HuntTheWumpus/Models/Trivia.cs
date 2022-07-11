@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
     public class Trivia
     {
@@ -14,7 +8,7 @@ namespace HuntTheWumpus.Models
         string Location { get; set; } = @"DataFiles/TriviaQuestions.txt";
         public List<int> UsedTriviaQuestions { get; set; } = new List<int>();
 
-        public void Save()
+        private void Save()
         {
             using var writer = new StreamWriter(Location);
             writer.WriteLine(Question);

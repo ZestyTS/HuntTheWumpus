@@ -22,11 +22,9 @@
 
         public void Save()
         {
-            using (var writer = new StreamWriter(Location))
-            {
-                writer.WriteLine(Name + "," + Score + "," + CaveNumber + "," + DateTime.Now.ToString() + ","
-                    + Turns + "," + Gold + "," + Arrows + "," + WumpusDefeated);
-            }
+            using var writer = new StreamWriter(Location);
+            writer.WriteLine(Name + "," + Score + "," + CaveNumber + "," + DateTime.Now.ToString() + ","
+                + Turns + "," + Gold + "," + Arrows + "," + WumpusDefeated);
         }
         public void ReorderFileByHighestScore()
         {
