@@ -39,22 +39,22 @@
     <None Update="Media\Audio\Ambient-2.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Lose-Baddie.wav">
+    <None Update="Media\Audio\Baddie\Lose-Baddie.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Lose-Wumpus.wav">
+    <None Update="Media\Audio\Wumpus\Lose-Wumpus.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Opening-Baddie.wav">
+    <None Update="Media\Audio\Baddie\Opening-Baddie.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Opening-Wumpus.wav">
+    <None Update="Media\Audio\Wumpus\Opening-Wumpus.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Win-Baddie.wav">
+    <None Update="Media\Audio\Baddie\Win-Baddie.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Media\Audio\Win-Wumpus.wav">
+    <None Update="Media\Audio\Wumpus\Win-Wumpus.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Media\Images\bat.png">
