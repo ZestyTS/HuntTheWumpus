@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
-    internal class HighScore
+    public class HighScore
     {
         public DateTime DateTime { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -28,13 +22,9 @@ namespace HuntTheWumpus.Models
 
         public void Save()
         {
-            using (var writer = new StreamWriter(Location))
-            {
-                writer.WriteLine(Name + "," + Score + "," + CaveNumber + "," + DateTime.Now.ToString() + ","
-                    + Turns + "," + Gold + "," + Arrows + "," + WumpusDefeated);
-            }
-
-            ReorderFileByHighestScore();
+            using var writer = new StreamWriter(Location);
+            writer.WriteLine(Name + "," + Score + "," + CaveNumber + "," + DateTime.Now.ToString() + ","
+                + Turns + "," + Gold + "," + Arrows + "," + WumpusDefeated);
         }
         public void ReorderFileByHighestScore()
         {
@@ -63,17 +53,29 @@ namespace HuntTheWumpus.Models
             {
                 while (!reader.EndOfStream)
                 {
-                    var highScoreSplit = reader.ReadLine().Split(',');
+                    var line = reader.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    var highScoreSplit = line.Split(',');
+                    var name = highScoreSplit[0];
+                    var score = Convert.ToInt32(highScoreSplit[1]);
+                    var caveNum = Convert.ToInt16(highScoreSplit[2]);
+                    var dateTime = DateTime.Parse(highScoreSplit[3]);
+                    var turn = Convert.ToInt16(highScoreSplit[4]);
+                    var gold = Convert.ToInt16(highScoreSplit[5]);
+                    var arrow = Convert.ToInt16(highScoreSplit[6]);
+                    var wumpusDefeated = Convert.ToBoolean(highScoreSplit[7]);
                     var highScore = new HighScore
                     {
-                        Name = highScoreSplit[0],
-                        Score = Convert.ToInt32(highScoreSplit[1]),
-                        CaveNumber = Convert.ToInt16(highscores[2]),
-                        DateTime = DateTime.Parse(highScoreSplit[3]),
-                        Turns = Convert.ToInt16(highScoreSplit[4]),
-                        Gold = Convert.ToInt16(highScoreSplit[5]),
-                        Arrows = Convert.ToInt16(highScoreSplit[6]),
-                        WumpusDefeated = Convert.ToBoolean(highScoreSplit[7])
+                        Name = name,
+                        Score = score,
+                        CaveNumber = caveNum,
+                        DateTime = dateTime,
+                        Turns = turn,
+                        Gold = gold,
+                        Arrows = arrow,
+                        WumpusDefeated = wumpusDefeated
                     };
                     highscores.Add(highScore);
                 }

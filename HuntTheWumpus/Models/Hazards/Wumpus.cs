@@ -1,29 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models.Hazards
 {
-    internal class Wumpus : Hazard
+    public class Wumpus : TriviaHazardBase
     {
+        public override int TriviaBattleMax { get; } = 5;
+        public override int TriviaBattleMin { get; } = 3;
+        public override string Name { get; set; }
+        public override string EnterSpeech { get; set; }
+        public override string Warning { get; set; }
+        public override string ImagePath { get; set; }
+        public string SneakSpeech { get; set; }
         public int PlayerMoveCounter { get; set; }
         public int MoveCounter { get; set; }
         public bool IsDead { get; set; } = false;
         public WumpusState State { get; set; } = WumpusState.Sleep;
         public int TurnMoveCounter { get; set; } = 1;
         public bool ActiveWumpus { get; set; } = false;
-        public int TriviaBattleMax { get; } = 5;
-        public int TriviaBattleMin { get; } = 3;
-        public override string Name { get; set; } = "Wumpus";
-        public string Song { get; set; } = string.Empty;
-        public override string Warning { get; set; } = "I smell a Wumpus!";
-        public override string ImagePath { get; set; } = "/Media/Images/wumpus.png";
-
-        public Wumpus()
+        public Wumpus(string name, string warning, string enterSpeech) : base(name, warning, enterSpeech)
         {
-            Song = "~Me me me me me~\n~I am the Great Mighty Wumpus and I'm going to test your trivia~\n~You might think you're all that with that puny brain of yours~\n~You are in my lair so it's time to see how you fair~\n";
+            Name = name;
+            EnterSpeech = enterSpeech;
+            Warning = warning;
+            ImagePath = "/Media/Images/" + Name.ToLower() + ".png";
+            SneakSpeech = "The " + Name + " snuck up on you!";
         }
 
         public enum WumpusState
@@ -36,7 +34,7 @@ namespace HuntTheWumpus.Models
         {
             State = WumpusState.Moving;
             var random = new Random();
-            MoveCounter += random.Next(moveUpTo);
+            MoveCounter += random.Next(0,moveUpTo);
         }
         public void NewLocation(List<int> connectedRooms)
         {
@@ -56,26 +54,24 @@ namespace HuntTheWumpus.Models
             }
 
             var random = new Random();
-            var moveTo = random.Next(connectedRooms.Count-1);
+            var moveTo = random.Next(connectedRooms.Count - 1);
 
             MoveCounter--;
             if (MoveCounter == 0)
                 State = WumpusState.Awake;
 
-
             Location = connectedRooms[moveTo];
-
         }
 
         public void RoundMove(List<int> connectedRooms, List<int> rooms)
         {
-            if (ActiveWumpus) 
+            if (ActiveWumpus)
             {
                 var random = new Random();
                 var chanceToShunpo = random.Next(0, 100);
                 if (chanceToShunpo < 6)
                 {
-                    var shunpo = random.Next(rooms.Count-1);
+                    var shunpo = random.Next(rooms.Count - 1);
                     Location = shunpo;
                 }
                 PlayerMoveCounter++;
@@ -93,11 +89,10 @@ namespace HuntTheWumpus.Models
                 }
             }
 
-            for(var i = 0; i < TurnMoveCounter; i++)
+            for (var i = 0; i < TurnMoveCounter; i++)
                 NewLocation(connectedRooms);
 
             TurnMoveCounter = 1;
         }
-
     }
 }

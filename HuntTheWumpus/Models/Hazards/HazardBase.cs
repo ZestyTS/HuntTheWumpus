@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models.Hazards
 {
-    public abstract class Hazard
+    public abstract class HazardBase
     {
         public int Location { get; set; }
         public abstract string Warning { get; set; }
         public abstract string ImagePath { get; set; }
         public abstract string Name { get; set; }
+        public abstract string EnterSpeech { get; set; }
         public enum HazardEnum
         {
             Nothing = 0,
@@ -19,6 +14,6 @@ namespace HuntTheWumpus.Models
             Bat = 2,
             Pitfall = 3
         }
-
+        public HazardBase(string name, string warning, string enterSpeech) { }
     }
 }

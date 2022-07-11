@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
-    internal class Trivia
+    public class Trivia
     {
         public string Question { get; set; } = string.Empty;
         public string[] AnswerKey { get; set; } = Array.Empty<string>();
         public int Answer { get; set; }
         string Location { get; set; } = @"DataFiles/TriviaQuestions.txt";
-       
+        public List<int> UsedTriviaQuestions { get; set; } = new List<int>();
 
-        public void Save()
+        private void Save()
         {
             using var writer = new StreamWriter(Location);
             writer.WriteLine(Question);
@@ -33,6 +27,8 @@ namespace HuntTheWumpus.Models
                 while (!reader.EndOfStream)
                 {
                     var question = reader.ReadLine();
+                    if (string.IsNullOrEmpty(question))
+                        continue;
 
                     var answerKey = new string[4];
                     for (var i = 0; i < 4; i++)
@@ -53,7 +49,7 @@ namespace HuntTheWumpus.Models
             }
             return trivias;
         }
-        public Dictionary<int, Trivia> SetupTriviaBattle(int max, List<int> UsedTriviaQuestions)
+        public Dictionary<int, Trivia> SetupTriviaBattle(int max)
         {
             var trivias = new List<Trivia>();
             trivias.AddRange(new Trivia().GetTrivias());

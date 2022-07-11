@@ -1,4 +1,4 @@
 ﻿using HuntTheWumpus.Controller;
 
-Game.GameSetup();
+new Game().GameSetup();
 

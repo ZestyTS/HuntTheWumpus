@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuntTheWumpus.Models
+﻿namespace HuntTheWumpus.Models
 {
     public class Cave
     {
         public List<Room> Rooms { get; set; } = new List<Room>();
-        public Dictionary<int, List<int>> RoomNeighbors { get; set; }
-        public Dictionary<int, List<int>> RoomConnections { get; set; }
+        public Dictionary<int, List<int>> RoomNeighbors { get; set; } = new Dictionary<int, List<int>>();
+        public Dictionary<int, List<int>> RoomConnections { get; set; } = new Dictionary<int, List<int>>();
         public int Number { get; set; }
+        public int Size { get; set; }
         public Cave(int caveNumber)
         {
+            if (caveNumber < 1)
+                return;
+
             Number = caveNumber;
             for (var i = 1; i < 31; i++)
             {
@@ -26,8 +24,9 @@ namespace HuntTheWumpus.Models
             RoomConnections = new Dictionary<int, List<int>>();
             SetConnections();
 
+            Size = GetRoomNumbers(Rooms).Count;
         }
-        public void SetNeighbors()
+        private void SetNeighbors()
         {
             //TODO: write an algorithm to figure out how rooms should be connected
             RoomNeighbors = GetRoomDataFromFile("DataFiles/CaveNeighbors.txt");
@@ -45,7 +44,7 @@ namespace HuntTheWumpus.Models
 
             return neighbors;
         }
-        public void SetConnections()
+        private void SetConnections()
         {
             RoomConnections = GetRoomDataFromFile("DataFiles/Cave" + Number + ".txt");
         }
@@ -78,10 +77,13 @@ namespace HuntTheWumpus.Models
                 var i = 1;
                 while (!streamReader.EndOfStream)
                 {
-                    roomData.Add(i, streamReader.ReadLine().Split(',').Select(int.Parse).ToList());
+                    var line = streamReader.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    roomData.Add(i, line.TrimEnd(',').Split(',').Select(int.Parse).ToList());
                     i++;
                 }
-
             }
             return roomData;
         }
