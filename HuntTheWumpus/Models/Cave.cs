@@ -81,7 +81,7 @@
                     if (string.IsNullOrEmpty(line))
                         continue;
 
-                    roomData.Add(i, line.Split(',').Select(int.Parse).ToList());
+                    roomData.Add(i, line.TrimEnd(',').Split(',').Select(int.Parse).ToList());
                     i++;
                 }
             }
