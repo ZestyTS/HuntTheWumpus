@@ -145,20 +145,15 @@ namespace HuntTheWumpus.Models
             var ran = new Random();
             var ranNum = ran.Next(0, 4);
 
-            switch (ranNum)
+            return ranNum switch
             {
-                case 0:
-                    return "A " + Bat.Name + " can be found in room " + batLocations[ran.Next(0, 1)];
-                case 1:
-                    return "A " + Pitfall.Name + " can be found in room " + pitLocations[ran.Next(0, 1)];
-                case 2:
-                    return playerInfo[ran.Next(0, 5)];
-                case 3:
-                    return wumpusInfo[ran.Next(0, 3)];
-                case 4:
-                    return "null";
-            }
-            return "There are no secrets available!";
+                0 => "A " + Bat.Name + " can be found in room " + batLocations[ran.Next(0, 1)],
+                1 => "A " + Pitfall.Name + " can be found in room " + pitLocations[ran.Next(0, 1)],
+                2 => playerInfo[ran.Next(0, 5)],
+                3 => wumpusInfo[ran.Next(0, 3)],
+                4 => "null", //silly way to make an easy check on the other side
+                _ => "There are no secrets available!",
+            };
         }
         public void BatAttack(int caveSize)
         {
@@ -199,6 +194,7 @@ namespace HuntTheWumpus.Models
             };
 
             highScore.Save();
+            highScore.ReorderFileByHighestScore();
         }
         public void GameSetup()
         {
