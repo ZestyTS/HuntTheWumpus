@@ -5,6 +5,10 @@ namespace UnitTest.ModelTests
     [TestClass]
     public class GameControlTest
     {
+        //This class will return failures unless real songs are added
+        //The .wav files that are part of the projects are blank text
+        //files with their extension being renamed from txt to wav
+        //so they are not real audio files, thus this class fails
         private readonly GameControl GameControl = new(new Theme(1));
         [TestMethod]
         public void ConstructorRealValues()
@@ -131,10 +135,18 @@ namespace UnitTest.ModelTests
             Assert.IsTrue(sameSpot < 4);
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GameEndSaveWithoutPlayerName()
         {
-            GameControl.GameEndSave();
+            try
+            {
+                GameControl.GameEndSave();
+                Assert.IsTrue(true);
+            }
+            catch
+            {
+                Assert.IsTrue(false);
+            }
+
         }
         [TestMethod]
         public void GameEndSaveRealData()
