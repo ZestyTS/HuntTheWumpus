@@ -9,31 +9,57 @@ namespace HuntTheWumpus.Models
         public string Lose { get; set; }
         public string[] Ambients { get; set; }
         public string Opening { get; set; }
-
+        private string ThemePath { get; set; }
+        public WaveOutEvent? OutputDevice { get; set; }
         public GameAudio(string name)
         {
             Ambients = new string[2];
-            Ambients[0] = MediaPath + "Ambient-1.wav";
-            Ambients[1] = MediaPath + "Ambient-2.wav";
+            Ambients[0] = MediaPath + "Ambient-1";
+            Ambients[1] = MediaPath + "Ambient-2";
 
-            Win = MediaPath + "Win-" + name + ".wav";
-            Lose = MediaPath + "Lose-" + name + ".wav";
-            Opening = MediaPath + "Opening-" + name + ".wav";
+            ThemePath = MediaPath + name + @"/";
+
+            Win = ThemePath + "Win-" + name;
+            Lose = ThemePath + "Lose-" + name;
+            Opening = ThemePath + "Opening-" + name;
+
+            SetExtensions();
         }
         public void PlayAudio(string soundLocation)
         {
-            try
-            {
-                var audioFile = new AudioFileReader(soundLocation);
-                var outputDevice = new WaveOutEvent();
+            using var audioFile = new AudioFileReader(soundLocation);
+            using var loop = new LoopStream(audioFile);
 
-                outputDevice.Init(audioFile);
-                outputDevice.Play();
-            }
-            catch
+            if (OutputDevice != null && OutputDevice.PlaybackState != PlaybackState.Stopped)
+                OutputDevice.Stop();
+
+            if (OutputDevice != null)
             {
-                //Something is wrong with audio
-                //So continue running with no audio
+                OutputDevice.Dispose();
+                OutputDevice = null;
+            }
+            OutputDevice = new WaveOutEvent();
+            OutputDevice.Init(loop);
+            OutputDevice.Play();
+        }
+        private void SetExtensions()
+        {
+            var directory = Directory.GetFiles(MediaPath);
+            for(var i = 0; i < directory.Length; i++)
+                Ambients[i] += Path.GetExtension(directory[i]);
+
+            directory = Directory.GetFiles(ThemePath);
+            for (var i = 0; i < directory.Length; i++)
+            {
+                var file =  directory[i];
+                var extension = Path.GetExtension(file);
+
+                if (file.Contains("Win"))
+                    Win += extension;
+                else if (file.Contains("Opening"))
+                    Opening += extension;
+                else
+                    Lose += extension;
             }
         }
     }

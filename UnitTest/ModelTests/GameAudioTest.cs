@@ -21,12 +21,22 @@ namespace UnitTest.ModelTests
         {
             Assert.IsNotNull(new GameAudio("Wumpus"));
         }
+        
         [TestMethod]
         public void PlayAudio()
         {
-            var gameAudio = new GameAudio("");
-            gameAudio.PlayAudio("");
-            Assert.Inconclusive("Not a real test");
+            var gameAudio = new GameAudio("Wumpus");
+            try
+            {
+                gameAudio.PlayAudio(gameAudio.Opening);
+                Assert.IsTrue(true);
+            }
+            catch
+            {
+                Assert.IsTrue(false);
+            }
+            
         }
+        
     }
 }

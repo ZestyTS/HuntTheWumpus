@@ -1,6 +1,7 @@
 ﻿using HuntTheWumpus.Helper;
 using HuntTheWumpus.Models;
 using HuntTheWumpus.Models.Hazards;
+using NAudio.Wave;
 using static HuntTheWumpus.Models.Hazards.HazardBase;
 
 namespace HuntTheWumpus.Controller
@@ -9,10 +10,18 @@ namespace HuntTheWumpus.Controller
     {
         private int ThemeChoice { get; set; } = 1;
         private GameControl GameControl { get; set; } = new GameControl(new Theme(1));
+        private WaveOutEvent? OutputDevice { get; set; } = null;
         public void GameSetup()
         {
             GameControl = new GameControl(new Theme(ThemeChoice));
+            if (OutputDevice != null)
+            {
+                OutputDevice.Stop();
+                OutputDevice.Dispose();
+                OutputDevice = null;
+            }
             GameControl.PlayOpeningAudio();
+            OutputDevice = GameControl.GameAudio.OutputDevice;
             GameMenu();
         }
         private void GameMenu()
