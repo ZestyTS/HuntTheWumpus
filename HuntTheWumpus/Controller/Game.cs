@@ -2,6 +2,8 @@
 using HuntTheWumpus.Models;
 using HuntTheWumpus.Models.Hazards;
 using NAudio.Wave;
+using UglyToad.PdfPig;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using static HuntTheWumpus.Models.Hazards.HazardBase;
 
 namespace HuntTheWumpus.Controller
@@ -33,7 +35,7 @@ namespace HuntTheWumpus.Controller
             switch (selection)
             {
                 case 1:
-                    DisplayRules();
+                    DisplayGameSpecification();
                     break;
                 case 2:
                     Start();
@@ -58,9 +60,13 @@ namespace HuntTheWumpus.Controller
             }
         }
 
-        private void DisplayRules()
+        private void DisplayGameSpecification()
         {
-            throw new NotImplementedException();
+            using var pdf = PdfDocument.Open(@"DataFiles\GameSpecification.pdf");
+                foreach (var page in pdf.GetPages())                    
+                    Console.WriteLine(ContentOrderTextExtractor.GetText(page));
+
+            Console.ReadKey();
         }
 
         private void StartRequirements()

@@ -65,7 +65,7 @@ namespace HuntTheWumpus.Models
                 "                                   Game Menu\n",
                 "*********************************************************************************\n",
                 "\n",
-                "            [1]  Display Rules\n",
+                "            [1]  Display Game Specification\n",
                 "            [2]  Start Game\n",
                 "            [3]  Select Theme\n",
                 "            [4]  View HighScores\n",
